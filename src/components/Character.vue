@@ -43,7 +43,7 @@ defineProps<{
 
 .character-sprite {
   width: 120px;
-  height: 160px;
+  height: 213px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -52,7 +52,7 @@ defineProps<{
 .character-sprite img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 10px;
   border: 2px solid #4a9eff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);

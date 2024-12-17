@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
 import type { Card } from '../types/game'
 
 const props = defineProps<{

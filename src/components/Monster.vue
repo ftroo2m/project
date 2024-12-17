@@ -46,7 +46,7 @@ defineProps<{
 
 .monster-sprite {
   width: 120px;
-  height: 160px;
+  height: 213px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -55,7 +55,7 @@ defineProps<{
 .monster-sprite img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 10px;
   border: 2px solid #e74c3c;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);

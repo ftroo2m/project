@@ -168,6 +168,11 @@ body{
 #sign-up{
     text-decoration: none;
 }
+#achieve{
+    position: relative;
+    transform: translate(50%,50%);
+}
+
 #container::before{
         content: "";
         position: absolute;
@@ -194,10 +199,7 @@ body{
         animation-duration: 2s;
         z-index: 9999;
 }
-#achieve{
-    position: relative;
-    transform: translate(50%,50%);
-}
+
 #container::v-deep(before) {
     content: "";
     position: absolute;
@@ -247,6 +249,7 @@ body{
         transform: translate(100%, -50%);
     }
 }
+
 #verification_code{
     border: #444;
     margin-left: 20px;

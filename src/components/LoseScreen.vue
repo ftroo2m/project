@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import type { Card } from '../types/game'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 defineProps<{
-  newCards: Card[]
 }>()
 
 const handleClose = () => {

@@ -3,7 +3,7 @@
     <h1>简单卡牌</h1>
     <p>浏览器上的卡牌游戏</p>
     <div class="menu-box">
-      <button @click="play">开始游戏</button>
+      <button @click="play">继续游戏</button>
       <button @click="newgame">新游戏</button>
       <button @click="leaderboard">排行榜</button>
       <button @click="logout">退出账号</button>

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { THEME_COLORS } from '../constants/colors';
-</script>
-
 <template>
   <div class="path"></div>
 </template>

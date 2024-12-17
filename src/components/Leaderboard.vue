@@ -68,7 +68,7 @@ onMounted(() => {
 
 <style scoped>
 .leaderboard {
-  background-image: url('../assets/index.jpg');
+  background-image: url('../assets/index.jpeg');
   background-size: cover;
   height: 100vh;
   display: flex;

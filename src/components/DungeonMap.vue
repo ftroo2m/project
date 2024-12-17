@@ -7,27 +7,30 @@ import PathConnection from './PathConnection.vue';
 import CardLibrary from './CardLibrary.vue';
 import { useRouter } from 'vue-router';
 
+// 定义地图节点接口
 interface MapNode {
   ID: number
   Name: string
-  Visit: number
+  Visit: number  // 0: 未访问, 1: 已访问
 }
 
-// 将 rooms 改为 ref
+// 初始化地牢房间配置
 const rooms = ref<Room[]>([
-  { id: 0, type: 'monster', completed: false },
+  { id: 0, type: 'monster', completed: false },  // 普通怪物房间
   { id: 1, type: 'monster', completed: false },
   { id: 2, type: 'monster', completed: false },
-  { id: 3, type: 'bonfire', completed: false },
-  { id: 4, type: 'elite', completed: false },
+  { id: 3, type: 'bonfire', completed: false },  // 休息处
+  { id: 4, type: 'elite', completed: false },    // 精英怪物房间
   { id: 5, type: 'elite', completed: false },
   { id: 6, type: 'bonfire', completed: false },
-  { id: 7, type: 'boss', completed: false }
+  { id: 7, type: 'boss', completed: false }      // Boss房间
 ]);
 
+// 当前可访问的房间ID
 const currentRoomId = ref(0);
 const router = useRouter();
 
+// 获取地图数据
 const fetchMapData = async () => {
   try {
     const response = await fetch('http://localhost:8080/api/game/map', {
@@ -42,14 +45,14 @@ const fetchMapData = async () => {
     if (data.code === 200 && data.data.nodes) {
       const newRooms = [...rooms.value];
       
-      // 找到第一个 Visit 为 0 的房间索引
+      // 找到第一个未访问的房间（Visit为0）
       const firstUnvisitedIndex = data.data.nodes.findIndex((node: MapNode) => node.Visit === 0);
       
-      // 更新房间状态
+      // 更新房间访问状态
       data.data.nodes.forEach((node: MapNode, index: number) => {
         if (node.ID < newRooms.length) {
           if (node.Visit === 1) {
-            // 已访问过的房间
+            // 标记已访问的房间为已完成
             newRooms[node.ID] = {
               ...newRooms[node.ID],
               completed: true
@@ -70,10 +73,10 @@ const fetchMapData = async () => {
   }
 };
 
-// 添加玩家卡牌状态
+// 玩家卡牌相关状态和函数
 const playerCards = ref<Card[]>([]);
 
-// 添加获取单张卡牌详情的函数
+// 获取单张卡牌详细信息
 const fetchCardDetail = async (cardName: string) => {
   try {
     const response = await fetch('http://localhost:8080/api/game/onecard', {
@@ -95,7 +98,7 @@ const fetchCardDetail = async (cardName: string) => {
   }
 };
 
-// 修改获取玩家卡牌的函数
+// 获取玩家所有卡牌
 const fetchPlayerCards = async () => {
   try {
     const response = await fetch('http://localhost:8080/api/game/card', {
@@ -111,7 +114,6 @@ const fetchPlayerCards = async () => {
       const cardDetails = await Promise.all(
         data.data.cards.map((cardName: string) => fetchCardDetail(cardName))
       );
-      // 过滤掉获取失败的卡牌
       playerCards.value = cardDetails.filter(card => card !== null);
     }
   } catch (error) {
@@ -119,31 +121,36 @@ const fetchPlayerCards = async () => {
   }
 };
 
+// 组件挂载时获取数据
 onMounted(() => {
   fetchMapData();
   fetchPlayerCards();
 });
 
+// 判断房间是否可进入
 const canEnterRoom = (room: Room) => {
   const node = room.id < rooms.value.length ? rooms.value[room.id] : null;
   if (!node) return false;
   
   // 已完成的房间不可再次进入
   if (node.completed) return false;
-
+  
+  // 只有当前房间可进入
   return room.id === currentRoomId.value;
 };
 
-// 添加动画状态
+// 治疗效果动画状态
 const showHealEffect = ref(false)
 const healEffectPosition = ref({ x: 0, y: 0 })
 
+// 处理房间点击事件
 const handleNodeClick = async (room: Room) => {
   if (!canEnterRoom(room)) {
     return;
   }
 
   if (room.type === 'bonfire') {
+    // 处理休息处逻辑
     try {
       const response = await fetch('http://localhost:8080/api/game/c/rest', {
         method: 'POST',
@@ -154,7 +161,7 @@ const handleNodeClick = async (room: Room) => {
       });
       const data = await response.json();
       if (data.code === 200) {
-        // 获取点击的房间节点位置
+        // 显示治疗效果
         const roomElement = document.querySelector(`[data-room-id="${room.id}"]`)
         if (roomElement) {
           const rect = roomElement.getBoundingClientRect()
@@ -165,7 +172,7 @@ const handleNodeClick = async (room: Room) => {
           showHealEffect.value = true
           setTimeout(() => {
             showHealEffect.value = false
-          }, 1500) // 1.5秒后隐藏动画
+          }, 1500)
         }
         
         rooms.value[room.id].completed = true;
@@ -175,13 +182,14 @@ const handleNodeClick = async (room: Room) => {
       console.error('Failed to rest:', error);
     }
   } else {
-    // 其他房间进入战斗
+    // 处理战斗房间逻辑
     rooms.value[room.id].completed = true;
     currentRoomId.value = room.id + 1;
     router.push(`/battle`);
   }
 };
 
+// 返回主菜单
 function backToMenu() {
   router.push('/')
 }
