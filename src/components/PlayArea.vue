@@ -1,43 +1,76 @@
 <script setup lang="ts">
-defineProps<{
+import { onMounted, onBeforeUnmount } from 'vue'
+import { gameSocket } from '../services/gameSocket'
+
+const props = defineProps<{
   isActive: boolean
+  currentCard?: string | null
+  playerEnergy: number
+  cards: any[]
 }>()
+
+const emit = defineEmits(['cardPlayed'])
+
+const handleMouseUp = (event: MouseEvent) => {
+  const playAreaElement = document.querySelector('.play-area')
+  if (!playAreaElement || !props.isActive || !props.currentCard) return
+  
+  const rect = playAreaElement.getBoundingClientRect()
+  
+  if (event.clientX >= rect.left && 
+      event.clientX <= rect.right && 
+      event.clientY >= rect.top && 
+      event.clientY <= rect.bottom) {
+    
+    const card = props.cards.find(c => c.Name === props.currentCard)
+    if (!card || card.Energy > props.playerEnergy) return
+    
+    gameSocket.send({
+      type: "card",
+      name: props.currentCard
+    })
+    
+    emit('cardPlayed')
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('mouseup', handleMouseUp)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('mouseup', handleMouseUp)
+})
 </script>
 
 <template>
-  <div class="play-area" :class="{ active: isActive }">
-    <div class="play-area-text" v-if="isActive">
-      Release to Play Card
+  <div 
+    class="play-area" 
+    :class="{ active: isActive }"
+  >
+    <div class="play-text">
+      Play Card
     </div>
   </div>
 </template>
 
 <style scoped>
 .play-area {
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  height: 100px;
-  border-radius: 15px;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  width: 200px;
+  height: 250px;
+  border: 2px dashed #666;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  opacity: 0;
-  pointer-events: none;
+  color: #666;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 1000;
 }
 
-.play-area.active {
-  opacity: 1;
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.play-area-text {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1.2rem;
+.active {
+  border-color: #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
 }
 </style>

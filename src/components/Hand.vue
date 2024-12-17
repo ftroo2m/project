@@ -7,28 +7,45 @@ const props = defineProps<{
   cards: Card[]
 }>()
 
+const emit = defineEmits(['dragStart', 'dragEnd'])
+
 const draggingCard = ref<Card | null>(null)
 const dragPosition = ref({ x: 0, y: 0 })
 const playAreaActive = ref(false)
 
-const onDragStart = (event: MouseEvent, card: Card) => {
+const handleCardDragStart = (event: MouseEvent, card: Card) => {
   draggingCard.value = card
   playAreaActive.value = true
-  dragPosition.value = { x: event.clientX, y: event.clientY }
-
-  const onMouseMove = (e: MouseEvent) => {
-    dragPosition.value = { x: e.clientX, y: e.clientY }
+  dragPosition.value = {
+    x: event.clientX,
+    y: event.clientY
   }
+  emit('dragStart', card.Name)
 
-  const onMouseUp = () => {
-    draggingCard.value = null
-    playAreaActive.value = false
-    window.removeEventListener('mousemove', onMouseMove)
-    window.removeEventListener('mouseup', onMouseUp)
+  // 添加鼠标移动事件监听
+  window.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('mouseup', handleMouseUp)
+}
+
+const handleMouseMove = (event: MouseEvent) => {
+  if (draggingCard.value) {
+    dragPosition.value = {
+      x: event.clientX,
+      y: event.clientY
+    }
   }
+}
 
-  window.addEventListener('mousemove', onMouseMove)
-  window.addEventListener('mouseup', onMouseUp)
+const handleMouseUp = () => {
+  window.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('mouseup', handleMouseUp)
+  handleCardDragEnd()
+}
+
+const handleCardDragEnd = () => {
+  draggingCard.value = null
+  playAreaActive.value = false
+  emit('dragEnd')
 }
 
 defineExpose({
@@ -40,22 +57,25 @@ defineExpose({
   <div class="hand">
     <DraggableCard
       v-for="card in cards"
-      :key="card.Name"
+      :key="card.ID"
       :card="card"
       :is-dragging="draggingCard === card"
       :drag-position="dragPosition"
-      @dragStart="onDragStart($event, card)"
+      @drag-start="($event) => handleCardDragStart($event, card)"
+      @drag-end="handleCardDragEnd"
     />
   </div>
 </template>
 
 <style scoped>
 .hand {
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   gap: 1rem;
+  justify-content: center;
+  padding: 2rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 </style>

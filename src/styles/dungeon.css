@@ -1,0 +1,10 @@
+.dungeon-page {
+  height: 100vh;
+  overflow-y: scroll !important;
+}
+
+.dungeon-page ~ html,
+.dungeon-page ~ body {
+  height: auto !important;
+  overflow: visible !important;
+}

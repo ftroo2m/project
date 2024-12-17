@@ -4,6 +4,7 @@ import type { GameState } from '../types/game'
 export class GameSocket {
     private ws: WebSocket | null = null;
     private gameStateCallback: ((state: GameState) => void) | null = null;
+    private messageCallbacks: Map<string, (data: any) => void> = new Map();
     
     async fetchCardDetails(cardName: string) {
       try {
@@ -35,7 +36,6 @@ export class GameSocket {
     
     connect(roomId: string, onGameState: (state: GameState) => void) {
       this.gameStateCallback = onGameState;
-      document.cookie = "playerID=zk";
       
       this.ws = new WebSocket('ws://localhost:8080/api/game/start/game');
       
@@ -50,9 +50,11 @@ export class GameSocket {
         const data = JSON.parse(event.data);
         console.log('收到消息:', data);
         
-        if (data.type === 'initReturn') {
-          const cardDetails = await this.processNewCards(data.player.newCard);
-          data.player.newCard = cardDetails;
+        if (data.type === 'initReturn' || data.type === 'cardEnd' || data.type === 'endRound' || data.type === 'monsterDeath' || data.type === 'playerDeath') {
+          if (data.player?.newCard) {
+            const cardDetails = await this.processNewCards(data.player.newCard);
+            data.player.newCard = cardDetails;
+          }
           this.gameStateCallback?.(data);
         }
       };
