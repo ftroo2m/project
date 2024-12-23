@@ -49,7 +49,7 @@ const fetchMapData = async () => {
       const firstUnvisitedIndex = data.data.nodes.findIndex((node: MapNode) => node.Visit === 0);
       
       // 更新房间访问状态
-      data.data.nodes.forEach((node: MapNode, index: number) => {
+      data.data.nodes.forEach((node: MapNode) => {
         if (node.ID < newRooms.length) {
           if (node.Visit === 1) {
             // 标记已访问的房间为已完成

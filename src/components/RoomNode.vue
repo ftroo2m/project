@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { gameSocket } from '../services/gameSocket'
 import { getRoomIcon } from '../utils/roomUtils'
 import type { Room } from '../types/room'
 
@@ -14,19 +11,6 @@ const props = defineProps<{
   class?: string | Record<string, boolean>     // 自定义类名
 }>()
 
-const router = useRouter()
-
-// 处理房间节点点击事件
-const handleNodeClick = () => {
-  // 如果房间被锁定，则不处理点击事件
-  if (props.isLocked) return
-  
-  // 连接到对应房间的 WebSocket
-  gameSocket.connect(`room${props.id}`, (state) => {
-    console.log('Connected to room:', props.id)
-    router.push(`/battle/${props.id}`)
-  })
-}
 </script>
 
 <template>

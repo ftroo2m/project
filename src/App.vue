@@ -23,6 +23,6 @@ button,
 a,
 *[onclick],
 *[class*="clickable"] {
-  cursor: url('./assets/point.png'), pointer;
+  cursor: url('./assets/point.png'), pointer !important;
 }
 </style>

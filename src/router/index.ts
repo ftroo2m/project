@@ -58,7 +58,6 @@ router.beforeEach((to, from, next) => {
     } else if (to.path === '/index') {
       next()
     } else if (to.path === '/battle' && from.path !== '/dungeon') {
-      // 只能从 /dungeon 访问 /battle
       next('/dungeon')
     } else {
       next()

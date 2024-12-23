@@ -53,6 +53,8 @@ async function logout() {
         'Content-Type': 'application/json'
       }
     });
+    const data = await response.json();
+    console.log('Logout response:', data);
   } catch (error) {
     console.error('Logout failed:', error);
   }

@@ -91,7 +91,7 @@ const handleGameState = async (state: GameState) => {
 
 // 生命周期钩子
 onMounted(() => {
-  gameSocket.connect('roomId', handleGameState)
+  gameSocket.connect(handleGameState)
 })
 
 onUnmounted(() => {
